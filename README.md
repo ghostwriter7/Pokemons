@@ -1,1 +1,1 @@
-![Header Image](img.png)
+![Gotta Catch ’Em All: Algorithms & Data Structures](img.png)
