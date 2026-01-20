@@ -14,9 +14,9 @@ class InsertionSortTest extends Specification {
         input == expected
 
         where:
-        input                  || expected
-        [] as int[]              || [] as int[]
-        [1] as int[]             || [1] as int[]
-        [-5, 10, -6, 2] as int[] || [-6, -5, 2, 10] as int[]
+        input                           || expected
+        [] as Comparable[]              || [] as Comparable[]
+        [1] as Comparable[]             || [1] as Comparable[]
+        [-5, 10, -6, 2] as Comparable[] || [-6, -5, 2, 10] as Comparable[]
     }
 }

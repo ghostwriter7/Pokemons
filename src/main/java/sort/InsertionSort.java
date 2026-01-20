@@ -11,12 +11,12 @@ public class InsertionSort {
      * 3. Do not swap -> it is inefficient
      * 4. At the end write the current value
      */
-    public static void sort(int[] array) {
+    public static <T extends Comparable<? super T>> void sort(T[] array) {
         for (var i = 1; i < array.length; i++) {
             var value = array[i];
             var prevIndex = i - 1;
 
-            while (prevIndex >= 0 && array[prevIndex] > value) {
+            while (prevIndex >= 0 && array[prevIndex].compareTo(value) > 0) {
                 array[prevIndex + 1] = array[prevIndex];
                 prevIndex--;
             }
