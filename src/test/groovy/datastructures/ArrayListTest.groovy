@@ -61,4 +61,38 @@ class ArrayListTest extends Specification {
 
         finalList == [-1, 1, 100, 2, 4, 5, 6, 7, 8, 9, 50]
     }
+
+    def "iterator should throw an exception when a caller attempts to retrieve a next value but it is exhausted"() {
+        given: 'an iterator exists'
+            def list = new ArrayList<Integer>()
+            list.insertAt(5, 0)
+
+            ListIterator<Integer> iter = list.iterator()
+
+        and: 'it is exhausted'
+            iter.next()
+
+        when: 'a caller attempts to retrieve the next value'
+            iter.next()
+
+        then:
+        thrown(NoSuchElementException)
+    }
+
+    def "iterator should throw an exception when a concurrent modification is detected"() {
+        given:
+        def list = new ArrayList<Integer>()
+        list.insertAt(5, 0)
+
+        ListIterator<Integer> iter = list.iterator()
+
+        and: 'a concurrent modification occurs'
+        list.append(10)
+
+        when: 'the iterator is utilised'
+        iter.next()
+
+        then:
+        thrown(ConcurrentModificationException)
+    }
 }
