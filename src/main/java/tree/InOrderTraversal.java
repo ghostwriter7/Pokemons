@@ -3,6 +3,10 @@ package tree;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Depth-First Traversal
+ * Uses a Stack behind the scenes implicitly.
+ */
 public class InOrderTraversal {
 
     public static List<Integer> traverse(BinaryNode<Integer> node) {

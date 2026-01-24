@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * In pre-order traversal you firstly visit a node,
+ * In pre-order traversal you first visit a node,
  * Then you recurse the left branch (convention), and then the right branch.
+ * Depth-First Traversal
+ * Uses a Stack behind the scenes implicitly.
  */
 public class PreOrderTraversal {
 

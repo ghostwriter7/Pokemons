@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * In post order traversal, you firstly go all the way down the left branch
+ * In post-order traversal, you first go all the way down the left branch
  * and process a node when no more children are left.
+ * Depth-First Traversal
+ * Uses a Stack behind the scenes implicitly.
  */
 public class PostOrderTraversal {
 
