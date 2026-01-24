@@ -6,7 +6,7 @@ import java.util.Queue;
 /**
  * In Breadth-First traversal we use a Queue (as opposed to a Stack in Depth-First)
  */
-public class BreadthFirstBinarySearch {
+public class BreadthFirstSearch {
 
     public static boolean search(BinaryNode<Integer> head, int needle) {
         Queue<BinaryNode<Integer>> queue = new LinkedList<>();

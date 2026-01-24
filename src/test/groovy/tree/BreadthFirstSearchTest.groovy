@@ -3,7 +3,7 @@ package tree
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class BreadthFirstBinarySearchTest extends Specification {
+class BreadthFirstSearchTest extends Specification {
 
     def head = new BinaryNode(50,
             new BinaryNode(10,
@@ -19,7 +19,7 @@ class BreadthFirstBinarySearchTest extends Specification {
     @Unroll
     def "should return #expected when searching for #needle"() {
         expect:
-        BreadthFirstBinarySearch.search(head, needle) == expected
+        BreadthFirstSearch.search(head, needle) == expected
 
         where:
         needle || expected
