@@ -20,7 +20,25 @@ class BinarySearchTreeTest extends Specification {
         node(5, node(2, node(-2), node(4)), node(9, node(7), node(11))) | 13     || false
     }
 
+    @Unroll
+    def "should insert #value into a binary search tree"() {
+        when:
+        BinarySearchTree.insert(root, value)
+
+        then:
+        root.toString() == expected
+
+        where:
+        root                                              | value || expected
+        mutNode(5)                                        | 10    || '[ 5 10 ]'
+        mutNode(10, mutNode(8), mutNode(12, mutNode(11))) | 13    || '[ 10 8 12 11 13 ]'
+    }
+
     BinaryNode<Integer> node(int value, BinaryNode<Integer> left = null, BinaryNode<Integer> right = null) {
         new BinaryNode<Integer>(value, left, right)
+    }
+
+    MutableBinaryNode<Integer> mutNode(int value, MutableBinaryNode<Integer> left = null, MutableBinaryNode<Integer> right = null) {
+        new MutableBinaryNode<Integer>(value, left, right)
     }
 }
