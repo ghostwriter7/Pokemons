@@ -1,7 +1,7 @@
 package tree;
 
 public class MutableBinaryNode<T> {
-    private final T value;
+    private T value;
     private MutableBinaryNode<T> left;
     private MutableBinaryNode<T> right;
     private MutableBinaryNode<T> parent;
@@ -71,5 +71,7 @@ public class MutableBinaryNode<T> {
         walk(node.getRight(), sb);
     }
 
-
+    public void setValue(T value) {
+        this.value = value;
+    }
 }

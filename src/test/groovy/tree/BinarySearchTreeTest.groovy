@@ -34,6 +34,22 @@ class BinarySearchTreeTest extends Specification {
         mutNode(10, mutNode(8), mutNode(12, mutNode(11))) | 13    || '[ 10 8 12 11 13 ]'
     }
 
+    @Unroll
+    def "should remove a node"() {
+        given:
+        def toBeDeleted = mutNode(18, mutNode(17, mutNode(20)))
+        def root = mutNode(
+                10, mutNode(7, mutNode(5), mutNode(6)),
+                mutNode(15, mutNode(12), toBeDeleted))
+
+        when:
+        BinarySearchTree.delete(toBeDeleted)
+
+        then:
+        root.toString() == '[ 10 7 5 6 15 12 17 20 ]'
+    }
+
+
     BinaryNode<Integer> node(int value, BinaryNode<Integer> left = null, BinaryNode<Integer> right = null) {
         new BinaryNode<Integer>(value, left, right)
     }
