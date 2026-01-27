@@ -21,6 +21,15 @@ public abstract sealed class PriorityQueue<T extends Comparable<? super T>> perm
 
     protected final List<T> list = new ArrayList<>();
 
+    public int size() {
+        return list.size();
+    }
+
+    public T peek() {
+        if (list.isEmpty()) return null;
+        return list.getFirst();
+    }
+
     public T pop() {
         if (list.isEmpty()) return null;
 
@@ -51,7 +60,7 @@ public abstract sealed class PriorityQueue<T extends Comparable<? super T>> perm
         var targetChildIdx = choose(left, right);
         var childValue = list.get(targetChildIdx);
 
-        if (shouldSwap(value, childValue)) {
+        if (shouldSwap(childValue, value)) {
             list.set(index, childValue);
             list.set(targetChildIdx, value);
             heapifyDown(targetChildIdx);
