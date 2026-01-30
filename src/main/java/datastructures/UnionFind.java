@@ -3,11 +3,12 @@ package datastructures;
 import java.util.Arrays;
 
 /**
+ * Eager algorithm - does plenty of work eagerly.
  * This data structure is an implementation for integers.
  * It holds numbers for N - 1 (N is a size in the constructor).
  * The backing array holds the identifier of the component a given integer belongs to.
  * E.g. if data[0] = 5, then it means that a digit 0 belongs to the component 5.
- *
+ * <p>
  * initialization O(N)
  * union O(N)
  * find O(1)

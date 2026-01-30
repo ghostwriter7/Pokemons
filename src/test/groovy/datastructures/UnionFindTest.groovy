@@ -4,8 +4,8 @@ import spock.lang.Specification
 
 class UnionFindTest extends Specification {
 
-    def "should..."() {
-        given: 'a union-find data structure'
+    def "should build a UnionFind properly"() {
+        given:
         def uf = new UnionFind(10)
 
         when: 'populated with initial data'
