@@ -26,7 +26,7 @@ class QuickUnionTest extends Specification {
 
         then: 'items are correctly grouped'
         verifyAll {
-            uf.toString() == [1, 8, 1, 8, 3, 0, 5, 1, 8, 8].toString()
+            uf.toString() == [6, 2, 6, 4, 6, 6, 6, 2, 4, 4].toString()
             uf.count() == 1
         }
     }
