@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 
 public class RingBuffer<T> implements Iterable<T> {
     private final T[] buffer;
-    private int length = 0;
     private final int capacity;
     private int head = 0;
     private int tail = 0;
@@ -31,7 +30,6 @@ public class RingBuffer<T> implements Iterable<T> {
     public void push(T item) {
         if (isFull()) throw new BufferOverflowException();
         buffer[tail] = item;
-        length++;
         modCount++;
         tail = (tail + 1) % capacity;
     }
@@ -40,7 +38,6 @@ public class RingBuffer<T> implements Iterable<T> {
         if (isEmpty()) throw new BufferUnderflowException();
         var value = buffer[head];
         buffer[head] = null;
-        length--;
         modCount++;
         head = (head + 1) % capacity;
         return value;
@@ -57,15 +54,15 @@ public class RingBuffer<T> implements Iterable<T> {
     }
 
     public boolean isEmpty() {
-        return length == 0;
+        return size() == 0;
     }
 
     public boolean isFull() {
-        return length == (capacity - 1);
+        return size() == (capacity - 1);
     }
 
     public int size() {
-        return length;
+        return (tail - head + capacity) % capacity;
     }
 
     @Override
@@ -92,7 +89,7 @@ public class RingBuffer<T> implements Iterable<T> {
 
     private final class RingBufferIterator implements Iterator<T> {
         private int current = head;
-        private int remaining = length;
+        private int remaining = size();
         private final int expectedModCount = modCount;
 
         @Override
