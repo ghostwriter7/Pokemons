@@ -16,23 +16,23 @@ public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
 
     @Override
     public void prepend(T item) {
-        if (this.size == 0) {
-            this.head = this.tail = new Node<>(item, null);
+        if (size == 0) {
+            head = tail = new Node<>(item, null);
         } else {
-            var temp = this.head;
-            this.head = new Node<>(item, temp);
+            var temp = head;
+            head = new Node<>(item, temp);
         }
-        this.size++;
+        size++;
     }
 
     @Override
     public void append(T item) {
-        if (this.size == 0) {
-            this.head = this.tail = new Node<>(item, null);
+        if (size == 0) {
+            head = tail = new Node<>(item, null);
         } else {
-            var temp = this.tail;
-            this.tail = new Node<>(item, null);
-            temp.next = this.tail;
+            var temp = tail;
+            tail = new Node<>(item, null);
+            temp.next = tail;
         }
         this.size++;
     }
@@ -62,17 +62,17 @@ public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
     public T remove(T item) {
         if (size == 0) return null;
 
-        if (isEqual(this.head.value, item)) {
-            var value = this.head.value;
-            this.head = this.head.next;
-            this.size--;
+        if (isEqual(head.value, item)) {
+            var value = head.value;
+            head = head.next;
+            size--;
 
             updateTailIfNecessary();
 
             return value;
         }
 
-        var node = this.head;
+        var node = head;
 
         while (node.next != null) {
             var next = node.next;
@@ -97,23 +97,24 @@ public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
         assertIndexForAccess(idx);
 
         if (idx == 0) {
-            var value = this.head.value;
-            this.head = this.head.next;
-            this.size--;
+            var value = head.value;
+            head = head.next;
+            size--;
             updateTailIfNecessary();
             return value;
-        } else {
-            var previousNode = getNode(idx - 1);
-            var nodeForRemoval = previousNode.next;
-            previousNode.next = nodeForRemoval.next;
-
-            if (tail == nodeForRemoval) {
-                tail = previousNode;
-            }
-
-            this.size--;
-            return nodeForRemoval.value;
         }
+
+        var previousNode = getNode(idx - 1);
+        var nodeForRemoval = previousNode.next;
+        previousNode.next = nodeForRemoval.next;
+
+        if (tail == nodeForRemoval) {
+            tail = previousNode;
+        }
+
+        size--;
+        return nodeForRemoval.value;
+
     }
 
     @Override
@@ -124,6 +125,7 @@ public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
     private static final class Node<T> {
         private final T value;
         private Node<T> next;
+
         private Node(T value, Node<T> next) {
             this.value = value;
             this.next = next;
@@ -146,10 +148,10 @@ public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
         assertIndexForAccess(idx);
 
         if (idx == 0) {
-            return this.head;
+            return head;
         }
 
-        var node = this.head;
+        var node = head;
 
         for (int i = 0; i < idx; i++) {
             node = node.next;
@@ -159,10 +161,10 @@ public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
     }
 
     private void updateTailIfNecessary() {
-        if (this.size == 1) {
-            this.tail = this.head;
-        } else if (this.size == 0) {
-            this.tail = this.head = null;
+        if (size == 1) {
+            tail = head;
+        } else if (size == 0) {
+            tail = head = null;
         }
     }
 
