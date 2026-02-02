@@ -13,9 +13,9 @@ public class Queue<T> implements IQueue<T>, Iterable<T> {
     @Override
     public void offer(T item) {
         if (isEmpty()) {
-            head = tail = new Node<>(item, null);
+            head = tail = new Node<>(item);
         } else {
-            tail.next = new Node<>(item, null);
+            tail.next = new Node<>(item);
             tail = tail.next;
         }
         modCount++;
@@ -83,9 +83,8 @@ public class Queue<T> implements IQueue<T>, Iterable<T> {
         private final T value;
         private Node<T> next;
 
-        private Node(T value, Node<T> next) {
+        private Node(T value) {
             this.value = value;
-            this.next = next;
         }
     }
 }
