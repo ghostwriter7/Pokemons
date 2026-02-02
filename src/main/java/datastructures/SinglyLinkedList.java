@@ -1,130 +1,157 @@
 package datastructures;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
-    private int size = 0;
+public class SinglyLinkedList<T> implements Iterable<T> {
+    private int size;
     private Node<T> head;
     private Node<T> tail;
+    private int modCount;
 
-    @Override
-    public int size() {
-        return size;
-    }
+    public int size() { return size; }
 
-    @Override
-    public void prepend(T item) {
+    public void prepend(T value) {
         if (size == 0) {
-            head = tail = new Node<>(item, null);
+            head = tail = new Node<>(value);
         } else {
             var temp = head;
-            head = new Node<>(item, temp);
+            head = new Node<>(value, temp);
         }
         size++;
+        modCount++;
     }
 
-    @Override
-    public void append(T item) {
+    public void append(T value) {
         if (size == 0) {
-            head = tail = new Node<>(item, null);
+            head = tail = new Node<>(value);
         } else {
             var temp = tail;
-            tail = new Node<>(item, null);
+            tail = new Node<>(value);
             temp.next = tail;
         }
-        this.size++;
+        size++;
+        modCount++;
     }
 
-    @Override
-    public T get(int idx) {
-        return getNode(idx).value;
+    public T get(int index) {
+        return getNodeAt(index).value;
     }
 
-    @Override
-    public void insertAt(T item, int idx) {
-        assertIndexForInsert(idx);
+    public void insertAt(int index, T value) {
+        assertIndexForInsert(index);
 
-        if (idx == 0) {
-            prepend(item);
-        } else if (idx == size) {
-            append(item);
+        if (index == 0) {
+            prepend(value);
+        } else if (index == size) {
+            append(value);
         } else {
-            var previousNode = getNode(idx - 1);
-            var next = previousNode.next;
-            previousNode.next = new Node<>(item, next);
+            var previousNode = getNodeAt(index - 1);
+            previousNode.next = new Node<>(value, previousNode.next);
             size++;
+            modCount++;
         }
     }
 
-    @Override
-    public T remove(T item) {
+    public T remove(T value) {
         if (size == 0) return null;
 
-        if (isEqual(head.value, item)) {
-            var value = head.value;
+        if (isEqual(head.value, value)) {
+            var temp = head.value;
             head = head.next;
             size--;
-
             updateTailIfNecessary();
-
-            return value;
+            modCount++;
+            return temp;
         }
 
         var node = head;
 
         while (node.next != null) {
             var next = node.next;
-            if (isEqual(next.value, item)) {
+            if (isEqual(next.value, value)) {
                 node.next = next.next;
-
-                if (next == tail) {
-                    tail = node;
-                }
-
+                if (next == tail) tail = node;
+                modCount++;
                 size--;
                 return next.value;
             }
+
             node = next;
         }
 
         return null;
     }
 
-    @Override
-    public T removeAt(int idx) {
-        assertIndexForAccess(idx);
+    public T removeAt(int index) {
+        assertIndexForAccess(index);
 
-        if (idx == 0) {
-            var value = head.value;
-            head = head.next;
+        if (index == 0) {
+            var temp = head.value;
             size--;
+            modCount++;
+            head = head.next;
             updateTailIfNecessary();
-            return value;
+            return temp;
         }
 
-        var previousNode = getNode(idx - 1);
-        var nodeForRemoval = previousNode.next;
-        previousNode.next = nodeForRemoval.next;
-
-        if (tail == nodeForRemoval) {
-            tail = previousNode;
-        }
-
+        var previousNode = getNodeAt(index - 1);
+        var nodeToRemove = previousNode.next;
+        previousNode.next = nodeToRemove.next;
         size--;
-        return nodeForRemoval.value;
+        modCount++;
 
+        if (nodeToRemove == tail) tail = previousNode;
+
+        return nodeToRemove.value;
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return new SLLIterator();
+    public Iterator<T> iterator() { return new SLLIterator(); }
+
+    private void updateTailIfNecessary() {
+        if (size == 0) {
+            head = tail = null;
+        } else if (size == 1) {
+            tail = head;
+        }
     }
 
-    private static final class Node<T> {
+    private boolean isEqual(T valueA, T valueB) {
+        return Objects.equals(valueA, valueB);
+    }
+
+    private Node<T> getNodeAt(int index) {
+        assertIndexForAccess(index);
+
+        if (index == 0) return head;
+
+        var node = head;
+
+        for (var i = 0; i < index; i++) {
+            node = node.next;
+        }
+
+        return node;
+    }
+
+    private void assertIndexForAccess(int index) {
+        if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
+    }
+
+    private void assertIndexForInsert(int index) {
+        if (index < 0 || index > size) throw new IndexOutOfBoundsException();
+    }
+
+    private static class Node<T> {
         private final T value;
         private Node<T> next;
+
+        private Node(T value) {
+            this(value, null);
+        }
 
         private Node(T value, Node<T> next) {
             this.value = value;
@@ -132,60 +159,22 @@ public class SinglyLinkedList<T> implements IList<T>, Iterable<T> {
         }
     }
 
-    private void assertIndexForAccess(int idx) {
-        if (idx >= size || idx < 0) {
-            throw new IndexOutOfBoundsException("Index %d is out of bounds".formatted(idx));
-        }
-    }
-
-    private void assertIndexForInsert(int idx) {
-        if (idx > size || idx < 0) {
-            throw new IndexOutOfBoundsException("Index %d is invalid for insertion".formatted(idx));
-        }
-    }
-
-    private Node<T> getNode(int idx) {
-        assertIndexForAccess(idx);
-
-        if (idx == 0) {
-            return head;
-        }
-
-        var node = head;
-
-        for (int i = 0; i < idx; i++) {
-            node = node.next;
-        }
-
-        return node;
-    }
-
-    private void updateTailIfNecessary() {
-        if (size == 1) {
-            tail = head;
-        } else if (size == 0) {
-            tail = head = null;
-        }
-    }
-
-    private boolean isEqual(T value, T item) {
-        return Objects.equals(value, item);
-    }
-
     private final class SLLIterator implements Iterator<T> {
         private Node<T> current = head;
+        private final int expectedModCount = modCount;
 
         @Override
         public boolean hasNext() {
+            if (expectedModCount != modCount) throw new ConcurrentModificationException();
             return current != null;
         }
 
         @Override
         public T next() {
             if (!hasNext()) throw new NoSuchElementException();
-            var value = current.value;
+            var temp = current.value;
             current = current.next;
-            return value;
+            return temp;
         }
     }
 }
