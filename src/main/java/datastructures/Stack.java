@@ -11,13 +11,7 @@ public class Stack<T> implements IStack<T>, Iterable<T> {
 
     @Override
     public void push(T item) {
-        if (length == 0) {
-            head = new Node<>(item);
-        } else {
-            var temp = head;
-            head = new Node<>(item);
-            head.previous = temp;
-        }
+        head = new Node<>(item, head);
         length++;
         modCount++;
     }
@@ -37,6 +31,12 @@ public class Stack<T> implements IStack<T>, Iterable<T> {
     public T peek() {
         return head != null ? head.value : null;
     }
+
+    @Override
+    public boolean isEmpty() { return length == 0; }
+
+    @Override
+    public int size() { return length; }
 
     @Override
     public Iterator<T> iterator() {
@@ -65,12 +65,5 @@ public class Stack<T> implements IStack<T>, Iterable<T> {
         }
     }
 
-    private static final class Node<T> {
-        private final T value;
-        private Node<T> previous;
-
-        private Node(T value) {
-            this.value = value;
-        }
-    }
+    private record Node<T>(T value, Node<T> previous) { }
 }
