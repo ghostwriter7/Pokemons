@@ -1,11 +1,11 @@
-package datastructures
+package datastructures.heap
 
 import spock.lang.Specification
 
 class MaxHeapTest extends Specification {
     def "should perform heap operations correctly"() {
         given:
-        def heap = new PriorityQueue.MaxHeap<Integer>()
+        def heap = new MaxHeap<Integer>(10)
 
         when:
         heap.insert(5)

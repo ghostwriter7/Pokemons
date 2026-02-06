@@ -1,4 +1,5 @@
-package datastructures
+package datastructures.heap
+
 
 import spock.lang.Specification
 
@@ -6,7 +7,7 @@ class MinHeapTest extends Specification {
 
     def "should perform heap operations correctly"() {
         given:
-        def heap = new PriorityQueue.MinHeap<Integer>()
+        def heap = new MinHeap<Integer>(10)
 
         when:
         heap.insert(100)
