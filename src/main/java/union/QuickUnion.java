@@ -1,4 +1,4 @@
-package datastructures;
+package union;
 
 import java.util.Arrays;
 
@@ -15,15 +15,17 @@ import java.util.Arrays;
  * This way we maintain a compact tree with faster find().
  */
 public class QuickUnion {
-    private final int[] data;
+    protected final int[] data;
     private final int[] sizes;
     private int count;
 
     public QuickUnion(int size) {
         data = new int[size];
-        for (int i = 0; i < size; i++) data[i] = i;
         sizes = new int[size];
-        for (int i = 0; i < size; i++) sizes[i] = 1;
+        for (int i = 0; i < size; i++){
+            data[i] = i;
+            sizes[i] = 1;
+        }
         count = size;
     }
 
@@ -61,9 +63,10 @@ public class QuickUnion {
         return Arrays.toString(data);
     }
 
-    private int findRoot(int p) {
-        if (data[p] == p) return data[p];
-
-        return findRoot(data[p]);
+    protected int findRoot(int p) {
+        while (p != data[p]) {
+            p = data[p];
+        }
+        return p;
     }
 }
