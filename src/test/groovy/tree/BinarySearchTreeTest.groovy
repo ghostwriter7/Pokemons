@@ -26,35 +26,30 @@ class BinarySearchTreeTest extends Specification {
         BinarySearchTree.insert(root, value)
 
         then:
-        root.toString() == expected
+        BinarySearchTree.print(root) == expected
 
         where:
         root                                              | value || expected
-        mutNode(5)                                        | 10    || '[ 5 10 ]'
-        mutNode(10, mutNode(8), mutNode(12, mutNode(11))) | 13    || '[ 10 8 12 11 13 ]'
+        node(5)                                        | 10    || '[ 5 10 ]'
+        node(10, node(8), node(12, node(11))) | 13    || '[ 10 8 12 11 13 ]'
     }
 
     @Unroll
     def "should remove a node"() {
         given:
-        def toBeDeleted = mutNode(18, mutNode(17, mutNode(20)))
-        def root = mutNode(
-                10, mutNode(7, mutNode(5), mutNode(6)),
-                mutNode(15, mutNode(12), toBeDeleted))
+        def toBeDeleted = node(18, node(17, node(20)))
+        def root = node(
+                10, node(7, node(5), node(6)),
+                node(15, node(12), toBeDeleted))
 
         when:
         BinarySearchTree.delete(toBeDeleted)
 
         then:
-        root.toString() == '[ 10 7 5 6 15 12 17 20 ]'
+        BinarySearchTree.print(root) == '[ 10 7 5 6 15 12 17 20 ]'
     }
 
-
-    BinaryNode<Integer> node(int value, BinaryNode<Integer> left = null, BinaryNode<Integer> right = null) {
-        new BinaryNode<Integer>(value, left, right)
-    }
-
-    MutableBinaryNode<Integer> mutNode(int value, MutableBinaryNode<Integer> left = null, MutableBinaryNode<Integer> right = null) {
-        new MutableBinaryNode<Integer>(value, left, right)
+    BinarySearchTree.BinaryNode<Integer> node(int value, BinarySearchTree.BinaryNode<Integer> left = null, BinarySearchTree.BinaryNode<Integer> right = null) {
+        new BinarySearchTree.BinaryNode<Integer>(value, left, right)
     }
 }
