@@ -2,7 +2,7 @@ package datastructures.graph;
 
 import java.util.*;
 
-public class GraphSearch {
+public final class GraphSearch {
 
     public static List<Integer> bfsOnAdjacencyMatrix(int[][] adjMatrix, int source, int target) {
         var n = adjMatrix.length;
@@ -43,4 +43,36 @@ public class GraphSearch {
         Collections.reverse(out);
         return out;
     }
+
+    public static List<Integer> dfsOnAdjacencyList(GraphEdge[][] graph, int source, int target) {
+        var n = graph.length;
+        var visited = new boolean[n];
+        List<Integer> path = new LinkedList<>();
+
+        var found = walk(graph, source, target, path, visited);
+        return found ? path : List.of();
+    }
+
+    private static boolean walk(GraphEdge[][] graph, int current, int target, List<Integer> path, boolean[] visited) {
+        if (visited[current]) return false;
+
+        visited[current] = true;
+
+        if (current == target) {
+            path.add(current);
+            return true;
+        }
+
+        path.add(current);
+
+        for (var i = 0; i < graph[current].length; i++) {
+            var edge = graph[current][i];
+            if (walk(graph, edge.to, target, path, visited)) return true;
+        }
+
+        path.removeLast();
+        return false;
+    }
+
+    public record GraphEdge(int to, int weight) {}
 }
