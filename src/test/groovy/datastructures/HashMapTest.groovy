@@ -59,5 +59,19 @@ class HashMapTest extends Specification {
             map.get('C') == null
             map.get('D') == null
         }
+
+        when:
+        map.put('P', 26)
+        map.put('H', 7)
+
+        then:
+        verifyAll(map) {
+            containsKey('P')
+            containsKey('H')
+            !containsKey('D')
+            containsValue(26)
+            containsValue(7)
+            !containsValue(100)
+        }
     }
 }
