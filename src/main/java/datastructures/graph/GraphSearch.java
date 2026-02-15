@@ -57,13 +57,9 @@ public final class GraphSearch {
         if (visited[current]) return false;
 
         visited[current] = true;
-
-        if (current == target) {
-            path.add(current);
-            return true;
-        }
-
         path.add(current);
+
+        if (current == target) return true;
 
         for (var i = 0; i < graph[current].length; i++) {
             var edge = graph[current][i];
