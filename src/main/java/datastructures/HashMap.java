@@ -1,46 +1,45 @@
 package datastructures;
 
 import java.util.*;
-import java.util.ArrayList;
+import java.util.stream.Collectors;
 
-public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
+class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
     private int capacity;
     private int size;
+    private List<Entry<K, V>>[] buckets;
     private int modCount;
-    private LinkedList<Entry<K, V>>[] buckets;
 
     public HashMap(int capacity) {
         this.capacity = capacity;
         initEmptyBuckets();
     }
 
-    public V get(K key) {
-        assertNotNullKey(key);
-        for (Entry<K, V> entry : getBucket(key)) {
-            if (entry.key.equals(key)) return entry.value;
-        }
-
-        return null;
-    }
-
     public void put(K key, V value) {
         assertNotNullKey(key);
-        if (shouldResize()) resize();
+        resizeIfNecessary();
 
         var bucket = getBucket(key);
-        var iter = bucket.listIterator();
         modCount++;
-        size++;
 
-        while (iter.hasNext()) {
-            var next = iter.next();
-            if (next.key.equals(key)) {
-                next.value = value;
+        for (var entry : bucket) {
+            if (entry.key.equals(key)) {
+                entry.value = value;
                 return;
             }
         }
 
+        size++;
         bucket.add(new Entry<>(key, value));
+    }
+
+    public V get(K key) {
+        assertNotNullKey(key);
+
+        for (var entry : getBucket(key)) {
+            if (entry.key.equals(key)) return entry.value;
+        }
+
+        return null;
     }
 
     public V remove(K key) {
@@ -49,6 +48,7 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
 
         var bucket = getBucket(key);
         var iter = bucket.listIterator();
+
         while (iter.hasNext()) {
             var next = iter.next();
             if (next.key.equals(key)) {
@@ -58,6 +58,7 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
                 return next.value;
             }
         }
+
         return null;
     }
 
@@ -70,58 +71,58 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
     public Set<K> keySet() {
         if (isEmpty()) return Set.of();
 
-        Set<K> keySet = new HashSet<>();
-
-        for (var bucket : buckets) {
-            for (var node : bucket) keySet.add(node.key);
-        }
-
-        return keySet;
+        return Arrays.stream(buckets)
+                .flatMap(List::stream)
+                .map(entry -> entry.key)
+                .collect(Collectors.toSet());
     }
 
     public Collection<V> values() {
         if (isEmpty()) return List.of();
 
-        List<V> values = new ArrayList<>(size);
-        for (var bucket : buckets) {
-            for (var node : bucket) values.add(node.value);
-        }
-        return values;
+        return Arrays.stream(buckets)
+                .flatMap(List::stream)
+                .map(entry -> entry.value)
+                .toList();
     }
 
     public Collection<Entry<K, V>> entries() {
         if (isEmpty()) return List.of();
 
-        List<Entry<K, V>> entries = new ArrayList<>(size);
-        for (var bucket : buckets) entries.addAll(bucket);
-        return entries;
+        return Arrays.stream(buckets)
+                .flatMap(List::stream)
+                .toList();
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public int size() {
+        return size;
     }
 
     public boolean containsKey(K key) {
         assertNotNullKey(key);
         if (isEmpty()) return false;
 
-        var bucket = getBucket(key);
-        for (var entry : bucket) {
-            if (entry.key.equals(key)) return true;
-        }
-        return false;
+        return Arrays.stream(buckets)
+                .flatMap(List::stream)
+                .anyMatch(entry -> entry.key.equals(key));
     }
 
     public boolean containsValue(V value) {
         if (isEmpty()) return false;
 
-        for (var bucket : buckets) {
-            for (var node : bucket) {
-                if (Objects.equals(node.value, value)) return true;
-            }
-        }
-        return false;
+        return Arrays.stream(buckets)
+                .flatMap(List::stream)
+                .anyMatch(entry -> Objects.equals(entry.value, value));
     }
 
-    public int size() { return size; }
-
-    public boolean isEmpty() { return size == 0; }
+    @Override
+    public Iterator<Entry<K, V>> iterator() {
+        return new HashMapIterator();
+    }
 
     @Override
     public String toString() {
@@ -133,25 +134,8 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
         return sb.toString();
     }
 
-    @Override
-    public Iterator<Entry<K, V>> iterator() { return new HashMapIterator(); }
-
-    private double getLoadFactor() {
-        return (double) size / capacity;
-    }
-
-    private void resize() {
-        capacity = capacity * 2;
-        var oldBuckets = buckets;
-
-        initEmptyBuckets();
-        size = 0;
-
-        for (var bucket : oldBuckets) {
-            for (var node : bucket) {
-                put(node.key, node.value);
-            }
-        }
+    private void assertNotNullKey(K key) {
+        if (key == null) throw new NullPointerException("Key must not be null");
     }
 
     private List<Entry<K, V>> getBucket(K key) {
@@ -160,12 +144,21 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
         return buckets[bucketIndex];
     }
 
-    private boolean shouldResize() {
-        return getLoadFactor() > 0.7;
-    }
+    private void resizeIfNecessary() {
+        var loadFactor = (double) size / capacity;
 
-    private void assertNotNullKey(K key) {
-        if (key == null) throw new NullPointerException("Key is null");
+        if (loadFactor > 0.7) {
+            capacity *= 2;
+            var currentBuckets = buckets;
+            initEmptyBuckets();
+            size = 0;
+
+            for (var bucket : currentBuckets) {
+                for (var entry : bucket) {
+                    put(entry.key, entry.value);
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -176,15 +169,24 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
         }
     }
 
+    public static class Entry<K, V> {
+        private final K key;
+        private V value;
+
+        private Entry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
     private final class HashMapIterator implements Iterator<Entry<K, V>> {
         private final int expectedModCount = modCount;
-        private int currentBucket;
+        private int bucketIndex;
         private Iterator<Entry<K, V>> bucketIterator;
 
-        private HashMapIterator() {
-            currentBucket = findNextNonEmptyBucketIndex(0);
-            if (currentBucket != -1)
-                bucketIterator = buckets[currentBucket].iterator();
+        public HashMapIterator() {
+            bucketIndex = findNextNonEmptyBucketIndex(0);
+            bucketIterator = bucketIndex != -1 ? buckets[bucketIndex].iterator() : null;
         }
 
         @Override
@@ -196,12 +198,12 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
 
             if (bucketIterator.hasNext()) return true;
 
-            var nextBucket = findNextNonEmptyBucketIndex(currentBucket + 1);
+            var nextBucket = findNextNonEmptyBucketIndex(bucketIndex + 1);
 
             if (nextBucket == -1) return false;
 
-            currentBucket = nextBucket;
-            bucketIterator = buckets[currentBucket].iterator();
+            bucketIndex = nextBucket;
+            bucketIterator = buckets[bucketIndex].iterator();
 
             return bucketIterator.hasNext();
         }
@@ -212,21 +214,12 @@ public class HashMap<K, V> implements Iterable<HashMap.Entry<K, V>> {
             return bucketIterator.next();
         }
 
-        private int findNextNonEmptyBucketIndex(int currentIndex) {
-            for (var i = currentIndex; i < buckets.length; i++) {
+
+        private int findNextNonEmptyBucketIndex(int index) {
+            for (var i = index; i < buckets.length; i++) {
                 if (!buckets[i].isEmpty()) return i;
             }
             return -1;
-        }
-    }
-
-    public static class Entry<K, V> {
-        private final K key;
-        private V value;
-
-        private Entry(K key, V value) {
-            this.key = key;
-            this.value = value;
         }
     }
 }
