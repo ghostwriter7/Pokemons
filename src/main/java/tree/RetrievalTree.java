@@ -1,5 +1,8 @@
 package tree;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Retrieval Tree, also known as Trie from Re'trie'val.
  * Great for caching / autocomplete.
@@ -7,52 +10,96 @@ package tree;
  */
 public class RetrievalTree {
 
-    private final Node[] children = new Node[26];
+    private final TrieNode root = new TrieNode();
     private static final int INDEX_ZERO = "a".codePointAt(0);
 
-    public RetrievalTree() {
-        populate(children);
-    }
-
     public void insert(String word) {
-        Node current = children[getIndexOf(word.charAt(0))];
+        assertNotEmpty(word);
 
-        for (int i = 1; i < word.length(); i++) {
-            var idx = getIndexOf(word.charAt(i));
-            if (current.children[idx] != null) {
-                current = current.children[idx];
-            } else {
-                var node = new Node(word.charAt(i));
-                current.children[idx] = node;
-                current = node;
+        TrieNode current = root;
+
+        for (var character : word.toCharArray()) {
+            var index = getIndexOf(character);
+
+            if (current.children[index] == null) {
+                current.children[index] = new TrieNode();
             }
+
+            current = current.children[index];
         }
 
-        current.setWord(true);
+        current.isEndOfWord = true;
+    }
+
+    public boolean search(String word) {
+        assertNotEmpty(word);
+        var endNode = getEndNode(word);
+        return endNode != null && endNode.isEndOfWord;
+    }
+
+    public boolean isPrefix(String prefix) {
+        assertNotEmpty(prefix);
+        var endNode = getEndNode(prefix);
+        return endNode != null;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty(root);
+    }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+
+        List<String> path = new ArrayList<>();
+        walk(root, path, sb);
+
+        return sb.toString().trim();
+    }
+
+    private boolean isEmpty(TrieNode node) {
+        for (var child : node.children) {
+            if (child != null) return false;
+        }
+        return true;
+    }
+
+    private TrieNode getEndNode(String word) {
+        TrieNode current = root;
+
+        for (var character : word.toCharArray()) {
+            var index = getIndexOf(character);
+
+            if (current.children[index] == null) return null;
+
+            current = current.children[index];
+        }
+
+        return current;
+    }
+
+    private void walk(TrieNode node, List<String> path, StringBuilder sb) {
+        if (node == null) return;
+
+        if (node.isEndOfWord) sb.append(String.join("", path)).append(" ");
+
+        for (var i = 0; i < node.children.length; i++) {
+            path.add(Character.toString((char) (i + INDEX_ZERO)));
+            walk(node.children[i], path, sb);
+            path.removeLast();
+        }
     }
 
     private int getIndexOf(char c) {
         return c - INDEX_ZERO;
     }
 
-    private void populate(Node[] nodes) {
-        for (int i = INDEX_ZERO; i <= "z".codePointAt(0); i++) {
-            nodes[i - INDEX_ZERO] = new Node((char) i);
-        }
+    private void assertNotEmpty(String word) {
+        if (word == null || word.isEmpty()) throw new IllegalArgumentException("Word cannot be empty");
     }
 
-    private class Node {
-        private final Character value;
-        private boolean isWord;
-        private Node[] children = new Node[26];
-
-        public Node(Character value) {
-            this.value = value;
-            populate(children);
-        }
-
-        public void setWord(boolean word) {
-            isWord = word;
-        }
+    private class TrieNode {
+        private final TrieNode[] children = new TrieNode[26];
+        private boolean isEndOfWord;
     }
 }
