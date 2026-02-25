@@ -13,6 +13,9 @@ class MergeSort {
         var mid = lo + (hi - lo) / 2;
         sort(array, aux, lo, mid);
         sort(array, aux, mid + 1, hi);
+
+        if (lessOrEqual(array[mid], array[mid + 1])) return;
+
         merge(array, aux, lo, mid, hi);
     }
 
