@@ -3,13 +3,13 @@ package sort
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class MergeSortTest extends Specification {
+class TopDownMergeSortTest extends Specification {
 
     @Unroll
     def "should sort an array"() {
 
         when:
-        MergeSort.sort(input)
+        TopDownMergeSort.sort(input)
 
         then:
         input == expected

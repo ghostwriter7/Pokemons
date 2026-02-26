@@ -1,6 +1,6 @@
 package sort;
 
-class MergeSort {
+class TopDownMergeSort {
 
     @SuppressWarnings("unchecked")
     static <T extends Comparable<? super T>> void sort(T[] arr) {
